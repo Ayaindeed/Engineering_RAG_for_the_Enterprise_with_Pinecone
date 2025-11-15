@@ -2,7 +2,7 @@
 
 ## About This Project
 
-This project demonstrates an enterprise-quality Retrieval Augmented Generation (RAG) application built with Pinecone and OpenAI. RAG is a critical component of search and chatbots that uses vector databases to retrieve facts and improve response quality. 
+Enterprise-quality Retrieval Augmented Generation (RAG) application built with Pinecone and OpenAI. RAG is a critical component of search and chatbots that uses vector databases to retrieve facts and improve response quality. 
 
 The system showcases enterprise RAG architecture including data management, access control, and performance monitoring considerations that are essential in production environments.
 
