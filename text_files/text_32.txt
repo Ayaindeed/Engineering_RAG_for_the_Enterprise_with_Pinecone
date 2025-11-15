@@ -1,0 +1,39 @@
+# Setting up billing through GCP Marketplace
+
+[Suggest Edits](/edit/setting-up-gcp-marketplace-billing)This document describes how to configure pay-as-you-go billing for your Pinecone organization through Google Cloud Platform (GCP) Marketplace. To commit to annual spending, [contact Pinecone](https://www.pinecone.io/contact).
+
+
+
+> ℹ️Note
+> 
+> 
+> 
+> This workflow creates a new Pinecone [organization](organizations). If you already have an organization, signing up through GCP Marketplace creates an additional organization.
+> 
+> 
+
+
+To configure Pinecone billing through the GCP Marketplace, follow these steps:
+
+
+1. Log in to the [GCP Marketplace](https://console.cloud.google.com/marketplace). Your project must be enabled for purchase by your billing administrator.
+2. Search for the [Pinecone listing](https://console.cloud.google.com/marketplace/product/pinecone-public/pinecone).
+3. Click **Subscribe**.
+4. Read and agree to the terms and conditions.
+5. Click **Subscribe**.
+6. On the **Your order request has been sent to Pinecone** dialog, click **Sign up with Pinecone**.
+7. On the **You're leaving Google** dialog, click **OK**. This takes you to the Pinecone sign-in page.
+8. Sign in to Pinecone.io.
+
+
+When you sign in, Pinecone creates a new organization linked to your GCP billing.
+
+
+If you already have a Pinecone organization, you can select the new "GCP Linked" organization in the top-left drop-down menu in the console.
+
+Updated 29 days ago 
+
+
+
+---
+

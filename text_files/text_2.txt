@@ -1,0 +1,29 @@
+# Manage datasets
+
+[Suggest Edits](/edit/datasets)## Overview
+
+
+This category contains concept topics and guides for tasks related to Pinecone datasets.
+
+
+## Concepts
+
+
+* [Pinecone public datasets](pinecone-public-datasets)
+
+
+## Tasks
+
+
+* [Using public Pinecone datasets](using-public-datasets)
+* [Creating and loading private datasets](creating-datasets)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Concepts](#concepts)
+	+ [Tasks](#tasks)

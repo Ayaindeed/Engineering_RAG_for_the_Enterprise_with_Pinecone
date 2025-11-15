@@ -1,0 +1,86 @@
+# Understanding multitenancy
+
+[Suggest Edits](/edit/multitenancy)## Overview
+
+
+This document describes concepts related to multitenancy in Pinecone indexes. This includes information on different approaches to keeping sets of vectors separate within a Pinecone index. To learn how to create or modify an index, see [Manage indexes](manage-indexes).
+
+
+You may need to segment vectors by customer or otherwise either physically or logically. This document describes different techniques to accomplish this and the advantages and advantages of each approach. 
+
+
+## Namespaces
+
+
+One approach to multitenancy is to use <namespaces> to isolate segments of vectors within a single index. This is a 'pool' model that shares most resources between tenants while keeping them logically separate.
+
+
+### Advantages
+
+
+* Namespaces reduce the need for additional indexes, reducing maintenance effort.
+
+
+### Disadvantages
+
+
+* Customer data is not isolated in its own pod. This means tenants share compute and storage resources.
+* Deleting tenant data is more complicated and takes more time.
+
+
+## Metadata filtering
+
+
+This approach to multitenancy stores all segments of vectors in a single index and [filters by metadata](metadata-filtering) at query time. This is another 'pool' model; here, you separate tenants on the query level.
+
+
+### Advantages
+
+
+* Metadata filtering allows you to query across multiple tenants.
+* Metadata filtering reduces the need for additional indexes, reducing maintenance effort.
+
+
+### Disadvantages
+
+
+* Customer data is not isolated in its own pod. This means tenants share compute and storage resources.
+* There is no way to track tenant-specific costs.
+* You cannot provision tenants with different dimensions or pod type characteristics, which are set at the index level.
+
+
+## Separate indexes
+
+
+Another approach to multitenancy is to create a separate index for each segment. This is a 'silo' model that provides dedicated resources to each tenant. For example, if you need to separate vectors for each customer, you can create a separate index for each customer.
+
+
+### Advantages
+
+
+* This model separates tenants into different pods, preventing queries across tenants and allocating compute and storage resources to each tenant.
+
+
+### Disadvantages
+
+
+* Creating and maintaining multiple indexes requires additional effort and cost.
+* Because this model doesn't share resources between tenants, you must assign each tenant at minimum one [pod](indexes#overview). This is extremely inefficient if you have tenants with small number of vectors.
+* Creating a new index takes more time than creating a namespace.
+Updated 28 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Namespaces](#namespaces)
+		- [Advantages](#advantages)
+		- [Disadvantages](#disadvantages)
+	+ [Metadata filtering](#metadata-filtering)
+		- [Advantages](#advantages-1)
+		- [Disadvantages](#disadvantages-1)
+	+ [Separate indexes](#separate-indexes)
+		- [Advantages](#advantages-2)
+		- [Disadvantages](#disadvantages-2)

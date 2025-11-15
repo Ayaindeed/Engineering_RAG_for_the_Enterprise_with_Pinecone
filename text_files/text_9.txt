@@ -1,0 +1,51 @@
+# Understanding subscription status
+
+[Suggest Edits](/edit/subscription-status)## Overview
+
+
+This document describes the different subscription statuses for your Pinecone organization.
+
+
+## Subscription statuses for accounts with past due payments
+
+
+Users on the [Standard and Enterprise Plans](https://www.pinecone.io/pricing/) pay regular payments [based on usage](understanding-cost). When a payment is past due, Pinecone may restrict your account.
+
+
+Past due accounts have one of the following subscription statuses:
+
+
+* **Restricted**. This organization is now on the Starter Plan and can no longer create new resources.
+* **Suspended**. The API keys for this organization are no longer valid; calls to the Pinecone API fail.
+* **Deactivated**. Pinecone archives this organization's indexes.
+
+
+## Reinstating a deactivated organization
+
+
+If your organization is deactivated, follow these steps to reinstate your subscription and reactivate your indexes:
+
+
+1. Pay all past due invoices.
+2. (For organizations with cloud marketplace billing) Reenable cloud marketplace billing for [AWS](setting-up-aws-marketplace-billing) or [GCP](setting-up-gcp-marketplace-billing).
+3. In the Pinecone console, [change your billing plan](changing-your-billing-plan) back to the desired plan.
+4. Click **API Keys**. This view displays your new API keys.
+5. Update all queries to use these new keys.
+6. [Recreate your indexes from the collections](manage-indexes#create-an-index-from-a-collection) that contain the backup of your old indexes.
+
+
+## What's next
+
+
+* Learn how to [change your billing plan](changing-your-billing-plan)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Subscription statuses for accounts with past due payments](#subscription-statuses-for-accounts-with-past-due-payments)
+	+ [Reinstating a deactivated organization](#reinstating-a-deactivated-organization)
+	+ [What's next](#whats-next)

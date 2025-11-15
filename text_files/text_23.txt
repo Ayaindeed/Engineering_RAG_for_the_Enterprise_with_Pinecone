@@ -1,0 +1,57 @@
+# Pinecone public datasets
+
+[Suggest Edits](/edit/pinecone-public-datasets)## Overview
+
+
+This document explains and describes Pinecone datasets.
+
+
+To learn about using public Pinecone datasets, see [Using public datasets](using-public-datasets).
+
+
+To learn about creating and listing datasets, see [Creating datasets](creating-datasets).
+
+
+## Datasets contain vectors and metadata
+
+
+Pinecone datasets contain rows of dense and sparse vector values and metadata. Pinecone's Python client supports upserting vectors from a dataset. You can also use datasets to iterate over vectors to automate queries.
+
+
+## Available public datasets
+
+
+The following table lists information about public Pinecone datasets that are currently available:
+
+
+
+
+| name | documents | source | bucket | task | dense model | sparse model |
+| --- | --- | --- | --- | --- | --- | --- |
+| ANN\_DEEP1B\_d96\_angular | 9,990,000 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_DEEP1B\_d96\_angular | ANN | ANN benchmark | None |
+| ANN\_Fashion-MNIST\_d784\_euclidean | 60,000 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_Fashion-MNIST\_d784\_euclidean | ANN | ANN benchmark | None |
+| ANN\_GloVe\_d200\_angular | 1,183,514 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_GloVe\_d200\_angular | ANN | ANN benchmark | None |
+| ANN\_GloVe\_d50\_angular | 1,183,514 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_GloVe\_d50\_angular | ANN | ANN benchmark | None |
+| ANN\_GloVe\_d64\_angular | 292,385 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_GloVe\_d64\_angular | ANN | ANN benchmark | None |
+| ANN\_MNIST\_d784\_euclidean | 60,000 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_MNIST\_d784\_euclidean | ANN | ANN benchmark | None |
+| ANN\_NYTimes\_d256\_angular | 290,000 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_NYTimes\_d256\_angular | ANN | ANN benchmark | None |
+| ANN\_SIFT1M\_d128\_euclidean | 1,000,000 | <https://github.com/erikbern/ann-benchmarks> | gs://pinecone-datasets-dev/ANN\_SIFT1M\_d128\_euclidean | ANN | ANN benchmark | None |
+| quora\_all-MiniLM-L6-bm25 | 522,931 | <https://quoradata.quora.com/First-Quora-Dataset-Release-Question-Pairs> | gs://pinecone-datasets-dev/quora\_all-MiniLM-L6-bm25 | similar questions | sentence-transformers/msmarco-MiniLM-L6-cos-v5 | naver/splade-cocondenser-ensembledistil |
+| quora\_all-MiniLM-L6-v2\_Splade | 522,931 | <https://quoradata.quora.com/First-Quora-Dataset-Release-Question-Pairs> | gs://pinecone-datasets-dev/quora\_all-MiniLM-L6-v2\_Splade | similar questions | sentence-transformers/msmarco-MiniLM-L6-cos-v5 | naver/splade-cocondenser-ensembledistil |
+
+
+## What's next
+
+
+* Learn more about [using datasets in the Pinecone Python client](https://pinecone-io.github.io/pinecone-datasets/pinecone_datasets.html)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Datasets contain vectors and metadata](#datasets-contain-vectors-and-metadata)
+	+ [Available public datasets](#available-public-datasets)
+	+ [What's next](#whats-next)

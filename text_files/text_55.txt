@@ -1,0 +1,16 @@
+# Amazon SageMaker
+
+[Suggest Edits](/edit/sagemaker)Amazon SageMaker and Pinecone can be used together for high-performance, scalable, and reliable **R**etrieval **A**ugmented **G**eneration (RAG) use-cases. The integration allows us to use SageMaker compute and model hosting for **L**arge **L**anguage **M**odels (LLMs) and Pinecone as the *knowledge base* that allows us to keep our LLMs up to date with the latest information and reduce the likelihood of hallucinations.
+
+
+Below are our example notebooks on how we can use Amazon SageMaker for RAG with Pinecone.
+
+
+* [RAG with Llama 2 and Pinecone with SageMaker JumpStart](https://github.com/pinecone-io/examples/blob/master/learn/generation/aws/sagemaker/sagemaker-llama-2-rag.ipynb)
+* [RAG with Hugging Face Models in SageMaker](https://github.com/pinecone-io/examples/blob/master/learn/generation/aws/sagemaker/sagemaker-huggingface-rag.ipynb)
+Updated 14 days ago 
+
+
+
+---
+

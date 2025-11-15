@@ -1,0 +1,103 @@
+# Authentication
+
+[Suggest Edits](/edit/authentication)This guide explains how to authenticate API calls to your Pinecone project.
+
+
+## Overview
+
+
+All API calls to your Pinecone index authenticate with an [API key](projects#api-keys) for the project containing the target index. If you are using a client, like the Python or Node.js clients, you can initialize a client object, which allows you to provide your API key in one place and use it multiple times. If you are making HTTP requests with a tool like cURL, the HTTP request must include a header that specifies the API key. This topic describes each method.
+
+
+## Finding your Pinecone API key
+
+
+To find your API key, open the [Pinecone console](https://app.pinecone.io) and click **API Keys**. This view also displays the [environment](projects#project-environment) for your project.
+
+
+## Initialize a client
+
+
+To initialize a client with your API key and environment, use the following code:
+
+
+PythonJavaScript
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+```
+
+```python
+import { PineconeClient } from '@pinecone-database/pinecone';
+
+const pinecone = new PineconeClient();
+
+await pinecone.init({
+    apiKey: "YOUR_API_KEY",
+    environment: "YOUR_ENVIRONMENT",
+});
+
+```
+
+Function calls with this client use the authentication information provided at initialization. For example:
+
+
+PythonJavaScript
+```python
+# Creates an index using the API key and environment stored in the client 'pinecone'.
+pinecone.create_index("auth-guide", dimension=8, metric="euclidean")
+
+```
+
+```python
+// Constructs a create index request object.
+const createRequest = {
+    name: "auth-guide",
+    dimension: 8,
+    metric:"euclidean",
+};
+
+// Creates an index using the API key and environment stored in the client 'pinecone'.
+await pinecone.createIndex({ createRequest });
+
+```
+
+## Add a header to an HTTP request
+
+
+When issuing an HTTP request to Pinecone, each request must contain an `Api-Key` header that specifies an API key. This API key must be valid for a project in the environment specified in the URL.
+
+
+curl
+```python
+curl -i -X POST \
+  -H 'Content-Type: application/json' \
+  -H 'Api-Key: YOUR_API_KEY_HERE' \
+  https://controller.YOUR_ENVIRONMENT.pinecone.io/databases \
+  -d '{
+    "name": "auth-guide",
+    "dimension": 8,
+    "metric": "euclidean"
+  }'
+
+```
+
+## Next steps
+
+
+* Learn more about using the [Pinecone Python client](python-client).
+* Learn more about using the [Pinecone Node client](node-client).
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Finding your Pinecone API key](#finding-your-pinecone-api-key)
+	+ [Initialize a client](#initialize-a-client)
+	+ [Add a header to an HTTP request](#add-a-header-to-an-http-request)
+	+ [Next steps](#next-steps)

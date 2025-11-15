@@ -1,0 +1,81 @@
+# Weighting sparse and dense vectors
+
+[Suggest Edits](/edit/weighting-sparse-and-dense-vectors)## Overview
+
+
+Pinecone supports vectors with sparse and dense values, which allows you to perform semantic and keyword search over your data in one query and combine the results for more relevant results. This topic describes how to weight sparse versus dense vectors when querying your index.
+
+
+To see sparse-dense embeddings in action, see the [Ecommerce hybrid search example](ecommerce-search).
+
+
+## Query a sparse-dense index with explicit weighting
+
+
+Because Pinecone's index views your sparse-dense vector as a single vector, it does not offer a built-in parameter to adjust the weight of a query's dense part against its sparse part; the index is agnostic to density or sparsity of coordinates in your vectors. You may, however, incorporate a linear weighting scheme by customizing your query vector, as we demonstrate in the function below.
+
+
+**Examples**
+
+
+The following example transforms vector values using an alpha parameter.
+
+
+Python
+```python
+def hybrid_score_norm(dense, sparse, alpha: float):
+    """Hybrid score using a convex combination
+
+    alpha * dense + (1 - alpha) * sparse
+
+    Args:
+        dense: Array of floats representing
+        sparse: a dict of `indices` and `values`
+        alpha: scale between 0 and 1
+    """
+    if alpha < 0 or alpha > 1:
+        raise ValueError("Alpha must be between 0 and 1")
+    hs = {
+        'indices': sparse['indices'],
+        'values':  [v * (1 - alpha) for v in sparse['values']]
+    }
+    return [v * alpha for v in dense], hs
+
+```
+
+The following example transforms a vector using the above function, then queries a Pinecone index. 
+
+
+Python
+```python
+sparse_vector = {
+   'indices': [10, 45, 16],
+   'values':  [0.5, 0.5, 0.2]
+}
+dense_vector = [0.1, 0.2, 0.3]
+
+hdense, hsparse = hybrid_score_norm(dense_vector, sparse_vector, alpha=0.75)
+
+query_response = index.query(
+    namespace="example-namespace",
+    top_k=10,
+    vector=hdense,
+    sparse_vector=hsparse
+)
+
+```
+
+## Next steps
+
+
+* [Ecommerce hybrid search example](ecommerce-search)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Query a sparse-dense index with explicit weighting](#query-a-sparse-dense-index-with-explicit-weighting)
+	+ [Next steps](#next-steps)

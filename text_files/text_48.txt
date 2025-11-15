@@ -1,0 +1,520 @@
+# Quickstart
+
+[Suggest Edits](/edit/quickstart)This guide explains how to set up a Pinecone vector database in minutes.
+
+
+## 1. Install Pinecone client (optional)
+
+
+This step is optional. Do this step only if you want to use [the Python client](/docs/python-client).
+
+
+Use the following shell command to install Pinecone:
+
+
+PythonJavaScript
+```python
+pip install pinecone-client
+
+```
+
+```python
+npm install @pinecone-database/pinecone
+
+```
+
+For other clients, see [Libraries](sdk).
+
+
+## 2. Get and verify your Pinecone API key
+
+
+To use Pinecone, you must have an API key. To find your API key, open the [Pinecone console](https://app.pinecone.io) and click **API Keys**. This view also displays the environment for your project. Note both your API key and your environment.
+
+
+To verify that your Pinecone API key works, use the following commands:
+
+
+PythonJavaScriptcurl
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+pinecone.list_indexes()
+
+```
+
+```python
+import { Pinecone } from '@pinecone-database/pinecone';
+
+const pinecone = new Pinecone({ 
+    apiKey: 'YOUR_API_KEY',
+    environment: 'YOUR_ENVIRONMENT'
+})
+await pinecone.listIndexes()
+
+```
+
+```python
+PINECONE_ENVIRONMENT='your-environment'
+PINECONE_API_KEY='your-api-key'
+
+curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/actions/whoami" \
+    -H "Api-Key: $PINECONE_API_KEY"
+
+```
+
+If you don't receive an error message, then your API key is valid.
+
+
+## 3. Hello, Pinecone!
+
+
+You can complete the remaining steps in three ways:
+
+
+* Use the ["Hello, Pinecone!" colab notebook](https://github.com/pinecone-io/examples/blob/master/docs/quick-tour/hello-pinecone.ipynb) to write and execute Python in your browser.
+* Copy the commands below into your local installation of Python.
+* Use the cURL API commands below.
+
+
+1. Initialize Pinecone
+
+
+PythonJavaScriptcurl
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+```
+
+```python
+import { Pinecone } from '@pinecone-database/pinecone';
+
+const pinecone = new Pinecone({
+  apiKey: 'your_api_key',
+  environment: 'your_environment',
+});
+
+```
+
+```python
+# Not applicable
+
+```
+
+2. Create an index.
+
+
+The commands below create an index named "quickstart" that performs approximate nearest-neighbor search using the [Euclidean distance metric](https://www.pinecone.io/docs/manage-indexes/#distance-metrics) for 8-dimensional vectors.
+
+
+Index creation takes roughly a minute.
+
+
+PythonJavaScriptcurl
+```python
+pinecone.create_index("quickstart", dimension=8, metric="euclidean")
+pinecone.describe_index("quickstart")
+
+```
+
+```python
+await pinecone.createIndex({
+    name: "quickstart",
+    dimension: 8,
+    metric: "euclidean",
+});
+await pinecone.describeIndex("quickstart");
+
+```
+
+```python
+PINECONE_API_KEY='your-api-key'
+PINECONE_ENVIRONMENT='your-environment'
+
+# Create the index
+curl -X POST "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/databases" \
+  -H "Api-Key: $PINECONE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "quickstart",
+    "dimension": 8,
+    "metric": "euclidean"
+  }'
+
+# Check index status
+curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/databases/quickstart" \
+  -H "Api-Key: $PINECONE_API_KEY"
+
+```
+
+
+> ⚠️Warning
+> 
+> 
+> 
+> In general, indexes on the Starter (free) plan are archived as collections and deleted after 7 days of inactivity; for indexes created by certain open source projects such as AutoGPT, indexes are archived and deleted after 1 day of inactivity. To prevent this, you can send any API request to Pinecone and the counter will reset.
+> 
+> 
+
+
+3. Retrieve a list of your indexes.
+
+
+ Once your index is created, its name appears in the index list.
+
+
+ Use the following commands to return a list of your indexes.
+
+
+PythonJavaScriptcurl
+```python
+pinecone.list_indexes()
+# Returns:
+# ['quickstart']
+
+```
+
+```python
+const list = await pinecone.listIndexes();
+// Returns:
+// [ { name: 'quickstart' } ]
+
+```
+
+```python
+PINECONE_API_KEY='your-api-key'
+PINECONE_ENVIRONMENT='your-environment'
+
+curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/databases" \
+  -H "Api-Key: $PINECONE_API_KEY"
+
+```
+
+4. Create a client instance
+
+
+Before you can query your index, you need to create a client instance that targets the index you just created.
+
+
+PythonJavaScriptcurl
+```python
+index = pinecone.Index("quickstart")
+
+```
+
+```python
+const index = pinecone.index("quickstart");
+
+```
+
+```python
+# Not applicable
+
+```
+
+5. Insert the data.
+
+
+To ingest vectors into your index, use the [`upsert`](https://www.pinecone.io/docs/api/operation/upsert/) operation. 
+
+
+The upsert operation inserts a new record in the index or updates the record if one with the same ID is already present.
+
+
+The following commands upsert 5 8-dimensional vectors into your index.
+
+
+PythonJavaScriptcurl
+```python
+# Upsert sample data (5 8-dimensional vectors)
+index.upsert([
+    ("A", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
+    ("B", [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]),
+    ("C", [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]),
+    ("D", [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]),
+    ("E", [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
+])
+
+```
+
+```python
+await index.upsert([
+  {
+    "id": "A",
+    "values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+  },
+  {
+    "id": "B",
+    "values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+  },
+  {
+    "id": "C",
+    "values": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]
+  },
+  {
+    "id": "D",
+    "values": [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+  },
+  {
+    "id": "E",
+    "values": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+  }
+]);
+
+```
+
+```python
+PINECONE_ENVIRONMENT='your-environment'
+PINECONE_API_KEY='your-api-key'
+
+PINECONE_PROJECT_ID=$(
+  curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/actions/whoami" \
+    -H "Api-Key: $PINECONE_API_KEY" | jq -r '.project_name'
+)
+
+curl -X POST "https://quickstart-$PINECONE_PROJECT_ID.svc.$PINECONE_ENVIRONMENT.pinecone.io/vectors/upsert" \
+  -H "Api-Key: $PINECONE_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "vectors": [
+      {
+        "id": "A",
+        "values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+      },
+      {
+        "id": "B",
+        "values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+      },
+      {
+        "id": "C",
+        "values": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]
+      },
+      {
+        "id": "D",
+        "values": [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+      },
+      {
+        "id": "E",
+        "values": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+      }
+    ]
+  }'
+
+```
+
+The cURL command above uses the [endpoint](manage-data/#specify-an-index-endpoint) for your Pinecone index. 
+
+
+
+> ℹ️Note
+> 
+> 
+> 
+> When upserting larger amounts of data, [upsert data in batches](insert-data/#batching-upserts) of 100 vectors or fewer over multiple upsert requests.
+> 
+> 
+
+
+6. Get statistics about your index.
+
+
+The following commands return statistics about the contents of your index.
+
+
+PythonJavaScriptcurl
+```python
+index.describe_index_stats()
+# Returns:
+# {'dimension': 8, 'index_fullness': 0.0, 'namespaces': {'': {'vector_count': 5}}}
+
+```
+
+```python
+const indexStats = await index.describeIndexStats();
+// Returns:
+// {
+//   namespaces: { '': { recordCount: 5 } },
+//   dimension: 8,
+//   indexFullness: 0,
+//   totalRecordCount: 5
+// }
+
+```
+
+```python
+PINECONE_ENVIRONMENT='your-environment'
+PINECONE_API_KEY='your-api-key'
+
+PINECONE_PROJECT_ID=$(
+  curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/actions/whoami" \
+    -H "Api-Key: $PINECONE_API_KEY" | jq -r '.project_name'
+)
+
+curl -X POST "https://quickstart-$PINECONE_PROJECT_ID.svc.$PINECONE_ENVIRONMENT.pinecone.io/describe_index_stats" \
+  -H "Api-Key: $PINECONE_API_KEY"
+# Output:
+# {
+#   "namespaces": {
+#     "": {
+#       "vectorCount": 5
+#     }
+#   },
+#   "dimension": 8,
+#   "indexFullness": 0.0,
+#   "totalVectorCount": 5
+# }
+
+```
+
+7. Query the index and get similar vectors.
+
+
+The following example queries the index for the three (3) vectors that are most similar to an example 8-dimensional vector using the Euclidean distance metric specified in step 2 ("Create an index.") above.
+
+
+PythonJavaScriptcurl
+```python
+index.query(
+  vector=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+  top_k=3,
+  include_values=True
+)
+# Returns:
+# {'matches': [{'id': 'C',
+#               'score': 0.0,
+#               'values': [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]},
+#              {'id': 'D',
+#               'score': 0.0799999237,
+#               'values': [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]},
+#              {'id': 'B',
+#               'score': 0.0800000429,
+#               'values': [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]}],
+#  'namespace': ''}
+
+```
+
+```python
+const queryResponse = await index.query({
+    topK: 3,
+    vector: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+    includeValues: true
+});
+// Returns:
+// {
+// 	matches: [{
+// 		id: "C",
+// 		score: 0,
+// 		values: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]
+// 	}, {
+// 		id: "D",
+// 		score: 0.0799999237,
+// 		values: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+// 	}, {
+// 		id: "B",
+// 		score: 0.0800000429,
+// 		values: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+// 	}],
+// 	namespace: ""
+// }
+
+```
+
+```python
+PINECONE_ENVIRONMENT='your-environment'
+PINECONE_API_KEY='your-api-key'
+
+PINECONE_PROJECT_ID=$(
+  curl "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/actions/whoami" \
+    -H "Api-Key: $PINECONE_API_KEY" | jq -r '.project_name'
+)
+
+curl -X POST "https://quickstart-$PINECONE_PROJECT_ID.svc.$PINECONE_ENVIRONMENT.pinecone.io/query" \
+  -H "Api-Key: $PINECONE_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "vector": [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+    "topK": 3,
+    "includeValues": true
+  }'
+# Output:
+# {
+#   "matches":[
+#     {
+#       "id": "C",
+#       "score": -1.76717265e-07,
+#       "values": [0.3,0.3,0.3,0.3,0.3,0.3,0.3,0.3]
+#     },
+#     {
+#       "id": "B",
+#       "score": 0.080000028,
+#       "values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
+#     },
+#     {
+#       "id": "D",
+#       "score": 0.0800001323,
+#       "values": [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+#     }
+#   ],
+#   "namespace": ""
+# }
+
+```
+
+8. Delete the index.
+
+
+Once you no longer need the index, use the [`delete_index`](https://www.pinecone.io/docs/api/operation/delete_index/) operation to delete it. 
+
+
+The following commands delete the index.
+
+
+PythonJavaScriptcurl
+```python
+pinecone.delete_index("quickstart")
+
+```
+
+```python
+await pinecone.deleteIndex("quickstart");
+
+```
+
+```python
+PINECONE_API_KEY='your-api-key'
+PINECONE_ENVIRONMENT='your-environment'
+
+curl -X DELETE "https://controller.$PINECONE_ENVIRONMENT.pinecone.io/databases/quickstart" \
+  -H "Api-Key: $PINECONE_API_KEY"
+
+```
+
+
+> ⚠️Warning
+> 
+> 
+> 
+> After you delete an index, you cannot use it again.
+> 
+> 
+
+
+## Next steps
+
+
+Now that you’re successfully making indexes with your API key, you can [start inserting data](insert-data) or [view more examples](examples).
+
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [1. Install Pinecone client (optional)](#1-install-pinecone-client-optional)
+	+ [2. Get and verify your Pinecone API key](#2-get-and-verify-your-pinecone-api-key)
+	+ [3. Hello, Pinecone!](#3-hello-pinecone)
+	+ [Next steps](#next-steps)

@@ -1,0 +1,189 @@
+# Overview
+
+An introduction to the Pinecone vector database.
+
+[Suggest Edits](/edit/overview)## Pinecone Overview
+
+
+Pinecone makes it easy to provide long-term memory for high-performance AI applications. It’s a managed, cloud-native [vector database](https://www.pinecone.io/learn/vector-database/) with a [simple API](/reference/) and no infrastructure hassles. Pinecone serves fresh, filtered query results with low latency at the scale of billions of vectors.
+
+
+## Vector embeddings provide long-term memory for AI.
+
+
+Applications that involve large language models, generative AI, and semantic search rely on [vector embeddings](https://www.pinecone.io/learn/vector-embeddings-for-developers/), a type of data that represents semantic information. This information allows AI applications to gain understanding and maintain a long-term memory that they can draw upon when executing complex tasks. 
+
+
+## Vector databases store and query embeddings quickly and at scale.
+
+
+Vector databases like Pinecone offer optimized storage and querying capabilities for embeddings. Traditional scalar-based databases can’t keep up with the complexity and scale of such data, making it difficult to extract insights and perform real-time analysis. Vector indexes like FAISS lack useful features that are present in any database. Vector databases combine the familiar features of traditional databases with the optimized performance of vector indexes.
+
+
+## Pinecone indexes store records with vector data.
+
+
+Each record in a Pinecone index contains a unique ID and an array of floats representing a dense vector embedding. 
+
+
+ ![Pinecone record diagram](https://raw.githubusercontent.com/pinecone-io/img/main/record-diagram.png)
+
+
+Each record may also contain a [sparse vector embedding](/docs/hybrid-search) for hybrid search and [metadata key-value pairs](/docs/metadata-filtered-search) for filtered queries.
+
+
+## Pinecone queries are fast and fresh.
+
+
+Pinecone returns low-latency, accurate results for indexes with billions of vectors. [High-performance pods](/docs/indexes#p2-pods) return up to 200 queries per second per replica. Queries reflect up-to-the-second updates such as upserts and deletes. [Filter by namespaces](/docs/namespaces) and [metadata](/docs/metadata-filtering) or [add resources](/docs/scaling-indexes) to improve performance.
+
+
+## Upsert and query vector embeddings with the Pinecone API.
+
+
+Perform CRUD operations and query your vectors using HTTP, [Python](/docs/python-client), or [Node.js](/docs/node-client).
+
+
+Python
+```python
+index = pinecone.Index('example-index') 
+
+upsert_response = index.upsert(
+    vectors=[
+        {'id': 'vec1',
+         'values': [0.1, 0.2, 0.3],
+         'metadata': {'genre': 'drama'},
+         'sparse_values': {
+             'indices': [10, 45, 16],
+             'values': [0.5, 0.5, 0.2]
+         }},
+        {'id': 'vec2',
+         'values': [0.2, 0.3, 0.4],
+         'metadata': {'genre': 'action'},
+         'sparse_values': {
+             'indices': [15, 40, 11],
+             'values': [0.4, 0.5, 0.2]
+         }}
+    ],
+    namespace='example-namespace'
+)
+
+```
+
+## Query your index for the most similar vectors.
+
+
+Specify the [distance metric](indexes#distance-metrics) your index uses to evaluate vector similarity, along with [dimensions](manage-indexes#creating-an-index) and [replicas](manage-indexes#replicas).
+
+
+PythonJavaScriptcurl
+```python
+pinecone.create_index("example-index", dimension=128, metric="euclidean", pods=4, pod_type="s1.x1")
+
+```
+
+```python
+await pinecone.createIndex({
+  name: "example-index",
+  dimension: 128,
+  metric: "euclidean",
+  pods: 4,
+  podType: "s1.x1",
+});
+
+```
+
+```python
+curl -i -X POST https://controller.YOUR_ENVIRONMENT.pinecone.io/databases \
+  -H 'Api-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "example-index",
+    "dimension": 128,
+    "metric": "euclidean",
+    "pods": 4,
+    "pod_type": "p1.x1"
+  }'
+
+```
+
+[Find the top `k` most similar vectors](query-data#sending-a-query), or query by ID.
+
+
+PythonJavaScriptcurl
+```python
+index.query(
+  vector=[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+  top_k=3,
+  include_values=True
+)
+
+# Returns:
+# {'matches': [{'id': 'C',
+#               'score': -1.76717265e-07,
+#               'values': [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]},
+#                   {'id': 'B',
+#                    'score': 0.080000028,
+#                    'values': [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]},
+#                   {'id': 'D',
+#                    'score': 0.0800001323,
+#                    'values': [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]}],
+# }
+
+```
+
+```python
+const index = pinecone.Index("example-index");
+const queryRequest = {
+  vector: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+  topK: 3,
+  includeValues: true
+};
+const queryResponse = await index.query({ queryRequest });
+
+// Returns:
+// {'matches': [{'id': 'C',
+//               'score': -1.76717265e-07,
+//               'values': [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3]},
+//                   {'id': 'B',
+//                    'score': 0.080000028,
+//                    'values': [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]},
+//                   {'id': 'D',
+//                    'score': 0.0800001323,
+//                    'values': [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]}],
+// }
+
+```
+
+```python
+curl -i -X POST https://hello-pinecone-YOUR_PROJECT.svc.YOUR_ENVIRONMENT.pinecone.io/query \
+  -H 'Api-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "vector":[0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3],
+    "topK": 3,
+    "includeValues": true
+  }'
+
+```
+
+## Get started
+
+
+[Go to the quickstart guide](/docs/quickstart) to get a production-ready vector search service up and running in minutes.
+
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Pinecone Overview](#pinecone-overview)
+	+ [Vector embeddings provide long-term memory for AI.](#vector-embeddings-provide-long-term-memory-for-ai)
+	+ [Vector databases store and query embeddings quickly and at scale.](#vector-databases-store-and-query-embeddings-quickly-and-at-scale)
+	+ [Pinecone indexes store records with vector data.](#pinecone-indexes-store-records-with-vector-data)
+	+ [Pinecone queries are fast and fresh.](#pinecone-queries-are-fast-and-fresh)
+	+ [Upsert and query vector embeddings with the Pinecone API.](#upsert-and-query-vector-embeddings-with-the-pinecone-api)
+	+ [Query your index for the most similar vectors.](#query-your-index-for-the-most-similar-vectors)
+	+ [Get started](#get-started)

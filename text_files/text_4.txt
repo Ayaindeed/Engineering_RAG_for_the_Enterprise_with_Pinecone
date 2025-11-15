@@ -1,0 +1,88 @@
+# Moving to production
+
+[Suggest Edits](/edit/moving-to-production)## Introduction
+
+
+The goal of this document is to prepare users to begin using their Pinecone indexes in production by anticipating production issues and identifying best practices for production indexes. Because these issues are highly workload-specific, the recommendations here are general.
+
+
+## Overview
+
+
+Once you have become familiar with Pinecone and experimented with creating indexes and queries that reflect your intended workload, you may be planning to use your indexes to serve production queries. Before you do, there are several steps you can take that can prepare your project for production workloads, anticipate production issues, and enable reliability and growth. 
+
+
+Consider the following areas before moving your indexes to production:
+
+
+## Prepare your project structure
+
+
+One of the first steps towards a production-ready Pinecone index is configuring your project correctly. Consider [creating a separate project](https://www.pinecone.io/docs/manage-projects/#creating-a-new-project) for your development and production indexes, to allow for testing changes to your index before deploying them to production. Ensure that you have properly [configured user access](https://www.pinecone.io/docs/manage-projects/#user-roles) to your production environment so that only those users who need to access the production index can do so. Consider how best to manage the API key associated with your production project.
+
+
+## Test your query results
+
+
+Before you move your index to production, make sure that your index is returning accurate results in the context of your application. Consider [identifying the appropriate metrics](https://www.pinecone.io/learn/offline-evaluation/) for evaluating your results. 
+
+
+## Estimate the appropriate number and size of pods and replicas
+
+
+Depending on your data and the types of workloads you intend to run, your project may require a different [number and size of pods](https://www.pinecone.io/docs/indexes/#pods-pod-types-and-pod-sizes) and [replicas](https://www.pinecone.io/docs/manage-indexes/#replicas). Factors to consider include the number of vectors, the dimensions per vector, the amount and cardinality of metadata, and the acceptable queries per second (QPS). Use the [index fullness metric](/reference/describe_index_stats_post) to identify how much of your current resources your indexes are using. You can [use collections to create indexes](https://www.pinecone.io/docs/manage-indexes/#create-an-index-from-a-collection) with different pod types and sizes to experiment.
+
+
+## Load test your indexes
+
+
+Before moving your project to production, consider determining whether your index configuration can serve the load of queries you anticipate from your application. You can write load tests in Python from scratch or using a load testing framework like [Locust](https://locust.io/).
+
+
+## Back up your indexes
+
+
+In order to enable long-term retention, compliance archiving, and deployment of new indexes, consider backing up your production indexes by [creating collections](https://www.pinecone.io/docs/back-up-indexes/). 
+
+
+## Tune for performance
+
+
+Before serving production workloads, identify ways to [improve latency](https://www.pinecone.io/docs/performance-tuning/) by making changes to your deployment, project configuration, or client. 
+
+
+## Configure monitoring
+
+
+Prepare to observe production performance and availability by [configuring monitoring](https://www.pinecone.io/docs/monitoring/) with Prometheus or OpenMetrics on your production indexes.
+
+
+## Plan for scaling
+
+
+Before going to production, consider planning ahead for how you might scale your indexes when the need arises. Identify metrics that may indicate the need to scale, such as [index fullness](/reference/describe_index_stats_post) and [average request latency](https://www.pinecone.io/docs/monitoring/#average-request-latency). Plan for increasing the number of pods, changing to a more performant [pod type](https://www.pinecone.io/docs/indexes/#pods-pod-types-and-pod-sizes), [vertically scaling](https://www.pinecone.io/learn/testing-p2-collections-scaling/#vertical-scaling-on-p1-and-s1) the [size of your pods](https://www.pinecone.io/docs/indexes/#pods-pod-types-and-pod-sizes), increasing the number of [replicas](https://www.pinecone.io/docs/manage-indexes/#replicas), or increasing storage capacity with a [storage-optimized pod type](https://www.pinecone.io/docs/indexes/#pods-pod-types-and-pod-sizes).
+
+
+## Know how to get support
+
+
+If you need help, visit [support.pinecone.io](https://support.pinecone.io), or talk to the [Pinecone community](https://www.pinecone.io/community/). Ensure that your [plan tier](https://www.pinecone.io/pricing/) matches the support and availability SLAs you need. This may require you to upgrade to Enterprise.
+
+Updated 28 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Introduction](#introduction)
+	+ [Overview](#overview)
+	+ [Prepare your project structure](#prepare-your-project-structure)
+	+ [Test your query results](#test-your-query-results)
+	+ [Estimate the appropriate number and size of pods and replicas](#estimate-the-appropriate-number-and-size-of-pods-and-replicas)
+	+ [Load test your indexes](#load-test-your-indexes)
+	+ [Back up your indexes](#back-up-your-indexes)
+	+ [Tune for performance](#tune-for-performance)
+	+ [Configure monitoring](#configure-monitoring)
+	+ [Plan for scaling](#plan-for-scaling)
+	+ [Know how to get support](#know-how-to-get-support)

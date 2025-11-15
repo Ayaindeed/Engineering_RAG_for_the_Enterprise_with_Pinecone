@@ -1,0 +1,313 @@
+# OpenAI
+
+[Suggest Edits](/edit/openai)
+
+[![](../images/source.svg) View Source](https://github.com/pinecone-io/examples/blob/master/integrations/openai/)
+
+[![](../images/colab.svg) Open in Colab](https://colab.research.google.com/github/pinecone-io/examples/blob/master/integrations/openai/semantic_search_openai.ipynb)
+
+This guide covers the integration of OpenAI's Large Language Models (LLMs) with Pinecone (referred to as the **OP stack**), enhancing semantic search or 'long-term memory' for LLMs. This combo utilizes LLMs' embedding and completion (or generation) endpoints, alongside Pinecone's vector search capabilities, for nuanced information retrieval.
+
+
+LLMs like OpenAI's `text-embedding-ada-002` generate vector embeddings, numerical representations of text semantics. These embeddings facilitate semantic-based rather than literal textual matches. Additionally, LLMs like `gpt-4` or `gpt-3.5-turbo` predict text completions based on previous context.
+
+
+Pinecone is a vector database designed for storing and querying high-dimensional vectors. It provides fast, efficient semantic search over these vector embeddings.
+
+
+By integrating OpenAI's LLMs with Pinecone, we combine deep learning capabilities for embedding generation with efficient vector storage and retrieval. This approach surpasses traditional keyword-based search, offering contextually-aware, precise results.
+
+
+There are many ways of integrating these two tools and we have several guides focusing on specific use-cases. If you already know what you'd like to do you can jump to these specific materials:
+
+
+* [Retrieval Augmentation with GPT-4](https://github.com/pinecone-io/examples/blob/master/learn/generation/openai/gpt-4-langchain-docs.ipynb)
+* [ChatGPT Plugins Walkthrough](https://youtu.be/hpePPqKxNq8)
+* [Ask Lex ChatGPT Plugin](https://github.com/pinecone-io/examples/tree/master/learn/generation/openai/chatgpt/plugins/ask-lex)
+* [Generative Question-Answering](https://github.com/pinecone-io/examples/blob/master/learn/generation/openai/gen-qa-openai.ipynb)
+* [Retrieval Augmentation using LangChain](https://github.com/pinecone-io/examples/blob/master/learn/generation/langchain/handbook/05-langchain-retrieval-augmentation.ipynb)
+
+
+## Introduction to Embeddings
+
+
+At the core of the OP stack we have embeddings which are supported via the [OpenAI Embedding API](https://beta.openai.com/docs/guides/embeddings). We index those embeddings in the [Pinecone vector database](https://www.pinecone.io) for fast and scalable retrieval augmentation of our LLMs or other information retrieval use-cases.
+
+
+*This example demonstrates the core OP stack. It is the simplest workflow and is present in each of the other workflows, but is not the only way to use the stack. Please refer to the links above for more advanced usage.*
+
+
+The OP stack is built for semantic search, question-answering, threat-detection, and other applications that rely on language models and a large corpus of text data.
+
+
+The basic workflow looks like this:
+
+
+* Embed and index
+	+ Use the OpenAI Embedding API to generate vector embeddings of your documents (or any text data).
+	+ Upload those vector embeddings into Pinecone, which can store and index millions/billions of these vector embeddings, and search through them at ultra-low latencies.
+* Search
+	+ Pass your query text or document through the OpenAI Embedding API again.
+	+ Take the resulting vector embedding and send it as a [query](/docs/query-data) to Pinecone.
+	+ Get back semantically similar documents, even if they don't share any keywords with the query.
+
+
+![Basic workflow of OpenAI and Pinecone](https://files.readme.io/6a3ea5a-pinecone-openai-overview.png)
+
+
+Let's get started...
+
+
+### Environment Setup
+
+
+We start by installing the OpenAI and Pinecone clients, we will also need HuggingFace *Datasets* for downloading the TREC dataset that we will use in this guide.
+
+
+Bash
+```python
+pip install -U openai pinecone-client datasets
+
+```
+
+### Creating Embeddings
+
+
+To create embeddings we must first initialize our connection to OpenAI Embeddings, we sign up for an API key at [OpenAI](https://beta.openai.com/signup).
+
+
+Python
+```python
+import openai
+
+openai.api_key = "<<YOUR_API_KEY>>"
+# get API key from top-right dropdown on OpenAI website
+
+openai.Engine.list()  # check we have authenticated
+
+```
+
+The `openai.Engine.list()` function should return a list of models that we can use. We will use OpenAI's Ada 002 model.
+
+
+Python
+```python
+MODEL = "text-embedding-ada-002"
+
+res = openai.Embedding.create(
+    input=[
+        "Sample document text goes here",
+        "there will be several phrases in each batch"
+    ], engine=MODEL
+)
+
+```
+
+In `res` we should find a JSON-like object containing two 1536-dimensional embeddings, these are the vector representations of the two inputs provided above. To access the embeddings directly we can write:
+
+
+Python
+```python
+# extract embeddings to a list
+embeds = [record['embedding'] for record in res['data']]
+
+```
+
+We will use this logic when creating our embeddings for the **T**ext **RE**trieval **C**onference (TREC) question classification dataset later.
+
+
+### Initializing a Pinecone Index
+
+
+Next, we initialize an index to store the vector embeddings. For this we need a Pinecone API key, [sign up for one here](https://app.pinecone.io).
+
+
+Python
+```python
+import pinecone
+
+# initialize connection to pinecone (get API key at app.pinecone.io)
+pinecone.init(
+    api_key="YOUR_API_KEY",
+    environment="YOUR_ENV"  # find next to API key in console
+)
+
+# check if 'openai' index already exists (only create index if not)
+if 'openai' not in pinecone.list_indexes():
+    pinecone.create_index('openai', dimension=len(embeds[0]))
+# connect to index
+index = pinecone.Index('openai')
+
+```
+
+### Populating the Index
+
+
+With both OpenAI and Pinecone connections initialized, we can move onto populating the index. For this, we need the TREC dataset.
+
+
+Python
+```python
+from datasets import load_dataset
+
+# load the first 1K rows of the TREC dataset
+trec = load_dataset('trec', split='train[:1000]')
+
+```
+
+Then we create a vector embedding for each question using OpenAI (as demonstrated earlier), and `upsert` the ID, vector embedding, and original text for each phrase to Pinecone.
+
+
+
+> ⚠️Warning
+> 
+> 
+> 
+> High-cardinality metadata values (like the unique text values we use here)  
+> 
+> can reduce the number of vectors that fit on a single pod. See  
+> 
+> [Limits](/docs/limits/) for more.
+> 
+> 
+
+
+Python
+```python
+from tqdm.auto import tqdm  # this is our progress bar
+
+batch_size = 32  # process everything in batches of 32
+for i in tqdm(range(0, len(trec['text']), batch_size)):
+    # set end position of batch
+    i_end = min(i+batch_size, len(trec['text']))
+    # get batch of lines and IDs
+    lines_batch = trec['text'][i: i+batch_size]
+    ids_batch = [str(n) for n in range(i, i_end)]
+    # create embeddings
+    res = openai.Embedding.create(input=lines_batch, engine=MODEL)
+    embeds = [record['embedding'] for record in res['data']]
+    # prep metadata and upsert batch
+    meta = [{'text': line} for line in lines_batch]
+    to_upsert = zip(ids_batch, embeds, meta)
+    # upsert to Pinecone
+    index.upsert(vectors=list(to_upsert))
+
+```
+
+### Querying
+
+
+With our data indexed, we're now ready to move onto performing searches. This follows a similar process to indexing. We start with a text `query`, that we would like to use to find similar sentences. As before we encode this with OpenAI's text similarity Babbage model to create a *query vector* `xq`. We then use `xq` to query the Pinecone index.
+
+
+Python
+```python
+query = "What caused the 1929 Great Depression?"
+
+xq = openai.Embedding.create(input=query, engine=MODEL)['data'][0]['embedding']
+
+```
+
+Now we query.
+
+
+Python
+```python
+res = index.query([xq], top_k=5, include_metadata=True)
+
+```
+
+The response from Pinecone includes our original text in the `metadata` field, let's print out the `top_k` most similar questions and their respective similarity scores.
+
+
+Python
+```python
+for match in res['matches']:
+    print(f"{match['score']:.2f}: {match['metadata']['text']}")
+
+```
+
+
+```python
+[Out]:
+0.95: Why did the world enter a global depression in 1929 ?
+0.87: When was `` the Great Depression '' ?
+0.86: What crop failure caused the Irish Famine ?
+0.82: What caused the Lynmouth floods ?
+0.79: What caused Harry Houdini 's death ?
+
+```
+
+Looks good, let's make it harder and replace *"depression"* with the incorrect term *"recession"*.
+
+
+Python
+```python
+query = "What was the cause of the major recession in the early 20th century?"
+
+# create the query embedding
+xq = openai.Embedding.create(input=query, engine=MODEL)['data'][0]['embedding']
+
+# query, returning the top 5 most similar results
+res = index.query([xq], top_k=5, include_metadata=True)
+
+for match in res['matches']:
+    print(f"{match['score']:.2f}: {match['metadata']['text']}")
+
+```
+
+
+```python
+[Out]:
+0.92: Why did the world enter a global depression in 1929 ?
+0.85: What crop failure caused the Irish Famine ?
+0.83: When was `` the Great Depression '' ?
+0.82: What are some of the significant historical events of the 1990s ?
+0.82: What is considered the costliest disaster the insurance industry has ever faced ?
+
+```
+
+Let's perform one final search using the definition of depression rather than the word or related words.
+
+
+Python
+```python
+query = "Why was there a long-term economic downturn in the early 20th century?"
+
+# create the query embedding
+xq = openai.Embedding.create(input=query, engine=MODEL)['data'][0]['embedding']
+
+# query, returning the top 5 most similar results
+res = index.query([xq], top_k=5, include_metadata=True)
+
+for match in res['matches']:
+    print(f"{match['score']:.2f}: {match['metadata']['text']}")
+
+```
+
+
+```python
+[Out]:
+0.93: Why did the world enter a global depression in 1929 ?
+0.83: What crop failure caused the Irish Famine ?
+0.82: When was `` the Great Depression '' ?
+0.82: How did serfdom develop in and then leave Russia ?
+0.80: Why were people recruited for the Vietnam War ?
+
+```
+
+It's clear from this example that the semantic search pipeline is clearly able to identify the meaning between each of our queries. Using these embeddings with Pinecone allows us to return the most semantically similar questions from the already indexed TREC dataset.
+
+Updated 23 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Introduction to Embeddings](#introduction-to-embeddings)
+		- [Environment Setup](#environment-setup)
+		- [Creating Embeddings](#creating-embeddings)
+		- [Initializing a Pinecone Index](#initializing-a-pinecone-index)
+		- [Populating the Index](#populating-the-index)
+		- [Querying](#querying)

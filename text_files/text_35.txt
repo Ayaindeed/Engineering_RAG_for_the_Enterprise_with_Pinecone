@@ -1,0 +1,47 @@
+# Datadog
+
+[Suggest Edits](/edit/datadog)## Overview
+
+
+This topic describes how to use Datadog to monitor your Pinecone vector database.
+
+
+## Set up your Pinecone integration on Datadog.
+
+
+After you [install a Datadog agent](https://docs.datadoghq.com/agent/), follow these steps to set up your Pinecone integration:
+
+
+1. Log in to [Datadoghq.com](https://datadoghq.com).
+2. Go to [Datadoghq.com](https://datadoghq.com) > [Integrations](https://datadoghq.com/integrations).
+3. In the search bar, enter 'Pinecone'.
+4. Click **Pinecone Integration**.
+5. Click **Install**.
+6. Under **Pinecone Accounts**, click **Add new**.
+7. Enter the [project ID](projects#project-id), [project environment](projects#project-environment), and [API key](projects#api-keys) for your project.
+8. In the left navigation menu, click **Dashboards**.
+9. Under **All Dashboards**, click **Pinecone Overview**. This dashboard shows basic monitoring data for your Pinecone vector database.
+
+
+## Create Datadog monitors for your Pinecone vector database.
+
+
+After you set up your Pinecone integration on Datadog, you can create monitors for your Pinecone vector database.
+
+
+1. Log in to [Datadoghq.com](https://datadoghq.com).
+2. Go to [Datadoghq.com](https://datadoghq.com) > [Integrations](https://datadoghq.com/integrations).
+3. In the search bar, enter 'Pinecone'.
+4. Click **Pinecone Integration**.
+5. Click the **Monitors** tab.
+6. [Configure your Datadog monitor](https://docs.datadoghq.com/monitors/configuration/?tab=thresholdalert) using [Pinecone's metrics](monitoring#available-metrics).
+Updated 28 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Set up your Pinecone integration on Datadog.](#set-up-your-pinecone-integration-on-datadog)
+	+ [Create Datadog monitors for your Pinecone vector database.](#create-datadog-monitors-for-your-pinecone-vector-database)

@@ -1,0 +1,33 @@
+# Add users to projects and organizations
+
+[Suggest Edits](/edit/add-users-to-projects-and-organizations)## Overview
+
+
+If you are a [project](/docs/projects) or [organization](/docs/organizations) owner, follow these steps to add users to organizations and projects. 
+
+
+## Add users to projects and organizations
+
+
+1. Access the [Pinecone Console](https://app.pinecone.io).
+2. Click **Settings** in the left menu.
+3. In the **Settings** view, click the **USERS** tab.
+4. Click **+INVITE USER**.
+5. (Organization owner only) Select an [organization role](organizations#organization-roles).
+6. Select one or more projects.
+7. Select a [project role](projects#project-roles).
+8. Enter the user's email address.
+9. Click **+INVITE USER**.
+
+
+When you invite another user to join your organization or project, Pinecone sends them an email containing a link that enables them to gain access to the organization or project. If they already have a Pinecone account, they still receive an email, but they can also immediately view the project.
+
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Add users to projects and organizations](#add-users-to-projects-and-organizations)

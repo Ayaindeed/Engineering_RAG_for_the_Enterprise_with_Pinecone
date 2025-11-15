@@ -1,0 +1,66 @@
+# Security
+
+[Suggest Edits](/edit/security)## Overview
+
+
+This document describes the security protocols and practices in use by Pinecone.
+
+
+## API keys
+
+
+Each Pinecone [project](projects) has one or more API keys. In order to make calls to the Pinecone API, a user must provide a valid API key for the relevant Pinecone project.
+
+
+## Role-based access controls (RBAC)
+
+
+Each Pinecone [organization](organizations) can assign users roles with respect to the organization and projects within the organization. These roles determine what permissions users have to make changes to the organization's billing, projects, and other users. To learn more, see [organization roles](organizations#organization-roles).
+
+
+## Organization single sign-on (SSO)
+
+
+SSO allows organizations to manage their teams' access to Pinecone through their identity management solution. Once your integration is configured, you can require that users from your domain sign in through SSO, and you can specify a default role for teammates when they sign up. Only organizations in the enterprise tier can set up SSO. To set up your SSO integration, contact Pinecone support at [[email protected]](/cdn-cgi/l/email-protection#bac9cfcacad5c8cefacad3d4dfd9d5d4df94d3d5).
+
+
+### End-to-end encryption (E2EE)
+
+
+Pinecone provides end-to-end encryption for user data, including encryption in transit and at rest.
+
+
+### Encryption in transit
+
+
+Pinecone uses standard protocols to encrypt user data in transit. Clients open HTTPS or gRPC connections to the Pinecone API; the Pinecone API gateway uses gRPC connections to user deployments in the cloud. These HTTPS and gRPC connections use the TLS 1.2 protocol with 256-bit Advanced Encryption Standard (AES-256) encryption. See Fig. 1 below. 
+
+
+**Figure 1: Pinecone encryption in transit**
+
+
+ ![Diagram showing encryption protocols for user data in transit](https://raw.githubusercontent.com/pinecone-io/img/main/encryption-in-transit.png) 
+
+
+Traffic is also encrypted in transit between the Pinecone backend and cloud infrastructure services, such as S3 and GCS. For more information, see [Google Cloud Platform](https://cloud.google.com/docs/security/encryption-in-transit) and [AWS security documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html).
+
+
+## Encryption at rest
+
+
+Pinecone encrypts stored data using the 256-bit Advanced Encryption Standard (AES-256) encryption algorithm.
+
+Updated 4 months ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [API keys](#api-keys)
+	+ [Role-based access controls (RBAC)](#role-based-access-controls-rbac)
+	+ [Organization single sign-on (SSO)](#organization-single-sign-on-sso)
+		- [End-to-end encryption (E2EE)](#end-to-end-encryption-e2ee)
+		- [Encryption in transit](#encryption-in-transit)
+	+ [Encryption at rest](#encryption-at-rest)

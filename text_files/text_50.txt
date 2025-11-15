@@ -1,0 +1,78 @@
+# Limits
+
+[Suggest Edits](/edit/limits)This is a summary of current Pinecone limitations. For many of these, there is a workaround or we're working on increasing the limits.
+
+
+## Upserts
+
+
+Max vector dimensionality is 20,000.
+
+
+Max size for an upsert request is 2MB. Recommended upsert limit is 100 vectors per request.
+
+
+Vectors may not be visible to queries immediately after upserting. You can check if the vectors were indexed by looking at the total with `describe_index_stats()`, although this method may not work if the index has multiple replicas. Pinecone is eventually consistent.
+
+
+Pinecone supports sparse vector values of sizes up to 1000 non-zero values.
+
+
+## Queries
+
+
+Max value for `top_k`, the number of results to return, is 10,000. Max value for `top_k` for queries with `include_metadata=True` or `include_data=True` is 1,000.
+
+
+## Fetch and Delete
+
+
+Max vectors per fetch or delete request is 1,000.
+
+
+## Namespaces
+
+
+There is no limit to the number of <namespaces> per index.
+
+
+## Pod storage capacity
+
+
+Each **p1** pod has enough capacity for 1M vectors with 768 dimensions.
+
+
+Each **s1** pod has enough capacity for 5M vectors with 768 dimensions.
+
+
+## Metadata
+
+
+Max metadata size per vector is 40 KB.
+
+
+Null metadata values are not supported. Instead of setting a key to hold a null value, we recommend you remove that key from the metadata payload.
+
+
+Metadata with high cardinality, such as a unique value for every vector in a large index, uses more memory than expected and can cause the pods to become full.
+
+
+## Retention
+
+
+In general, indexes on the Starter (free) plan are archived as collections and deleted after 7 days of inactivity; for indexes created by certain open source projects such as AutoGPT, indexes are archived and deleted after 1 day of inactivity. To prevent this, you can send any API request to Pinecone and the counter will reset.
+
+Updated about 1 month ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Upserts](#upserts)
+	+ [Queries](#queries)
+	+ [Fetch and Delete](#fetch-and-delete)
+	+ [Namespaces](#namespaces)
+	+ [Pod storage capacity](#pod-storage-capacity)
+	+ [Metadata](#metadata)
+	+ [Retention](#retention)

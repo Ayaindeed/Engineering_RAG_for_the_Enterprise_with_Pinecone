@@ -1,0 +1,211 @@
+# Monitoring
+
+[Suggest Edits](/edit/monitoring)This document describes how to configure monitoring for your Pinecone index using Prometheus or compatible tools.
+
+
+## Overview
+
+
+You can ingest performance metrics from Pinecone indexes into your own Prometheus instances, or into Prometheus- and OpenMetrics-compatible monitoring tools. The Prometheus metric endpoint is for users who want to monitor and store system health metrics using their own Prometheus metrics logger.
+
+
+
+> ⚠️Warning
+> 
+> 
+> 
+> This feature is in public preview and is only available to Enterprise or  
+> 
+> Enterprise Dedicated users.
+> 
+> 
+
+
+## Connect
+
+
+Metrics are available at a URL like the following:
+
+
+`https://metrics.YOUR_ENVIRONMENT.pinecone.io/metrics`
+
+
+Your API key must be passed via the Authorization header as a bearer token like the following:
+
+
+`Authorization: Bearer \<api-key\>`
+
+
+Only the metrics for the project associated with the API key are available at this URL.
+
+
+For Prometheus, configure prometheus.yml as follows:
+
+
+YAML
+```python
+scrape_configs:
+  - job_name: pinecone-job-1
+    authorization:
+      credentials: <api-key-here>
+    scheme: https
+    static_configs:
+      - targets: ['metrics.YOUR_ENVIRONMENT.pinecone.io']
+
+```
+
+[See Prometheus docs](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) for more configuration details.
+
+
+## Available Metrics
+
+
+The metrics available are as follows:
+
+
+
+
+
+| 
+ Name
+  | 
+ Type
+  | 
+ Description
+  | 
+ Labels
+  |
+| --- | --- | --- | --- |
+| 
+ pinecone\_vector\_count
+  | 
+ gauge
+  | 
+ The number of records per pod in the index.
+  | 
+ - pid: Process identifier
+ - index\_name: Name of the index
+ - project\_name: Pinecone project name |
+| 
+ pinecone\_request\_count\_total
+  | 
+ counter
+  | 
+ The number of data plane calls made by clients.
+  | 
+ - pid: Process identifier
+ - index\_name: Name of the index
+ - project\_name: Pinecone project name
+ - request\_type: One of upsert, delete, fetch, query, describe\_index\_stats |
+| 
+ pinecone\_request\_error\_count\_total
+  | 
+ counter
+  | 
+ The number of data plane calls made by clients that resulted in errors.
+  | 
+ - pid: Process identifier
+ - index\_name: Name of the index
+ - project\_name: Pinecone project name
+ - request\_type: One of upsert, delete, fetch, query, describe\_index\_stats |
+| 
+ pinecone\_request\_latency\_seconds
+  | 
+ histogram
+  | 
+ The distribution of server-side processing latency for pinecone data plane calls.
+  | 
+ - pid: Process identifier
+ - index\_name: Name of the index
+ - project\_name: Pinecone project name
+ - request\_type: One of upsert, delete, fetch, query, describe\_index\_stats |
+| 
+ pinecone\_index\_fullness
+  | 
+ gauge
+  | 
+ The fullness of the index on a scale of 0 to 1.
+  | 
+ - pid: Process identifier
+ - index\_name: Name of the index
+ - project\_name: Pinecone project name |
+
+
+
+## Example queries
+
+
+The following Prometheus queries gather information about your Pinecone index.
+
+
+### Average request latency
+
+
+The following query returns the average latency in seconds for all requests  
+
+against the Pinecone index `example-index`.
+
+
+
+```python
+avg by (request_type) (pinecone_request_latency_seconds{index_name="example-index"})
+
+```
+
+The following query returns the vector count for the Pinecone index `example-index`.
+
+
+
+```python
+sum ((avg by (app) (pinecone_vector_count{index_name="example-index"})))
+
+```
+
+The following query returns the total number of requests against the Pinecone index `example-index` over one minute.
+
+
+
+```python
+sum by (request_type)(increase(pinecone_request_count_total{index_name="example-index"}[60s]))
+
+```
+
+The following query returns the total number of upsert requests against the Pinecone index `example-index` over one minute.
+
+
+
+```python
+sum by (request_type)(increase(pinecone_request_count_total{index_name="example-index", request_type="upsert"}[60s]))
+
+```
+
+The following query returns the total errors returned by the Pinecone index `example-index` over one minute.
+
+
+
+```python
+sum by (request_type) (increase(pinecone_request_error_count{
+      index_name="example-index"}[60s]))
+
+```
+
+The following query returns the index fullness metric for the Pinecone index `example-index`.
+
+
+
+```python
+round(max (pinecone_index_fullness{index_name="example-index"} * 100))
+
+```
+Updated 28 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Connect](#connect)
+	+ [Available Metrics](#available-metrics)
+	+ [Example queries](#example-queries)
+		- [Average request latency](#average-request-latency)

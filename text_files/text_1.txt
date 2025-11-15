@@ -1,0 +1,82 @@
+# Understanding organizations
+
+[Suggest Edits](/edit/organizations)## Overview
+
+
+A Pinecone organization is a set of <projects> that use the same billing. Organizations allow one or more users to control billing and project permissions for all of the projects belonging to the organization. Each project belongs to an organization. 
+
+
+For a guide to adding users to an organization, see [Add users to a project or organization](add-users-to-projects-and-organizations/).
+
+
+## Projects in an organization
+
+
+Each organization contains one or more projects that share the same organization owners and billing settings. Each project belongs to exactly one organization. If you need to move a project from one organization to another, contact [Pinecone support](https://support.pinecone.io). 
+
+
+## Billing settings
+
+
+All of the projects in an organization share the same billing method and settings. The billing settings for the organization are controlled by the organization owners.
+
+
+## Organization roles
+
+
+There are two organization roles: organization owner and organization user.
+
+
+### Organization owners
+
+
+Organization owners manage organization billing, users, and projects. Organization owners are also [project owners](projects#project-roles) for every project belonging to the organization. This means that organization owners have all permissions to manage project members, API keys, and quotas for these projects.
+
+
+### Organization users
+
+
+Unlike organization owners, organization users cannot edit billing settings or invite new users to the organization. Organization users can create new projects, and project owners can add organization members to a project. New users have whatever role the organization owners and project owners grant them. Project owners can add users to a project if those users belong to the same organization as the project.
+
+
+**Table 1: Organization roles and permissions**
+
+
+
+
+| Organization role | Permissions in organization |
+| --- | --- |
+| Organization owner | Project owner for all projects |
+|  | Create projects |
+|  | Manage billing |
+|  | Manags organization members |
+| Organization member | Create projects |
+|  | Join projects when invited |
+|  | Read access to billing |
+
+
+## Organization single sign-on (SSO)
+
+
+SSO allows organizations to manage their teams' access to Pinecone through their identity management solution. Once your integration is configured, you can require that users from your domain sign in through SSO, and you can specify a default role for teammates when they sign up. Only organizations in the enterprise tier can set up SSO. To set up your SSO integration, contact Pinecone support at [[email protected]](/cdn-cgi/l/email-protection#a3d0d6d3d3ccd1d7e3d3cacdc6c0cccdc68dcacc).
+
+
+## Next steps
+
+
+* [Add users to an organization](add-users-to-projects-and-organizations/)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Projects in an organization](#projects-in-an-organization)
+	+ [Billing settings](#billing-settings)
+	+ [Organization roles](#organization-roles)
+		- [Organization owners](#organization-owners)
+		- [Organization users](#organization-users)
+	+ [Organization single sign-on (SSO)](#organization-single-sign-on-sso)
+	+ [Next steps](#next-steps)

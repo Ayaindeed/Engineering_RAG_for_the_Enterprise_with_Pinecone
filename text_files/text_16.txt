@@ -1,0 +1,1045 @@
+# Python Client
+
+[Suggest Edits](/edit/python-client)This page provides installation instructions, usage examples, and a reference for the [Pinecone Python client](https://github.com/pinecone-io/pinecone-python-client).
+
+
+## Getting Started
+
+
+### Installation
+
+
+Use the following shell command to install the Python client for use with Python versions 3.6+:
+
+
+Python
+```python
+pip3 install pinecone-client
+
+```
+
+Alternatively, you can install Pinecone in a Jupyter notebook:
+
+
+Python
+```python
+!pip3 install pinecone-client
+
+```
+
+We strongly recommend installing Pinecone in a virtual environment. For more information on using Python virtual environments, see:
+
+
+* [PyPA Python Packaging User Guide](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+* [Python Virtual Environments: A Primer](https://realpython.com/python-virtual-environments-a-primer/)
+
+
+There is a gRPC flavor of the client available, which comes with more dependencies in return for faster upload speeds. To install it, use the following command:
+
+
+Python
+```python
+pip3 install "pinecone-client[grpc]"
+
+```
+
+For the latest development version:
+
+
+Python
+```python
+pip3 install git+https://[[email protected]](/cdn-cgi/l/email-protection)/pinecone-io/pinecone-python-client.git
+
+```
+
+For a specific development version:
+
+
+Python
+```python
+pip3 install git+https://[[email protected]](/cdn-cgi/l/email-protection)/pinecone-io/pinecone-python-client.git
+pip3 install git+https://[[email protected]](/cdn-cgi/l/email-protection)/pinecone-io/pinecone-python-client.git@example-branch-name
+pip3 install git+https://[[email protected]](/cdn-cgi/l/email-protection)/pinecone-io/pinecone-python-client.git@259deff
+
+```
+
+### Usage
+
+
+#### Create index
+
+
+The following example creates an index without a metadata configuration. By default, Pinecone indexes all metadata.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY",
+              environment="YOUR_ENVIRONMENT")
+
+pinecone.create_index("example-index", dimension=1024)
+
+```
+
+The following example creates an index that only indexes the "color" metadata field. Queries against this index cannot filter based on any other metadata field.
+
+
+Python
+```python
+metadata_config = {
+    "indexed": ["color"]
+}
+
+pinecone.create_index("example-index-2", dimension=1024,
+                      metadata_config=metadata_config)
+
+```
+
+#### List indexes
+
+
+The following example returns all indexes in your project.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+active_indexes = pinecone.list_indexes()
+
+```
+
+#### Describe index
+
+
+The following example returns information about the index `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+index_description = pinecone.describe_index("example-index")
+
+```
+
+#### Delete index
+
+
+The following example deletes `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+pinecone.delete_index("example-index")
+
+```
+
+#### Scale replicas
+
+
+The following example changes the number of replicas for `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+new_number_of_replicas = 4
+pinecone.configure_index("example-index", replicas=new_number_of_replicas)
+
+```
+
+#### Describe index statistics
+
+
+The following example returns statistics about the index `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+index_stats_response = index.describe_index_stats()
+
+```
+
+#### Upsert vectors
+
+
+The following example upserts dense vectors to `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+upsert_response = index.upsert(
+    vectors=[
+        (
+         "vec1",                # Vector ID 
+         [0.1, 0.2, 0.3, 0.4],  # Dense vector values
+         {"genre": "drama"}     # Vector metadata
+        ),
+        (
+         "vec2", 
+         [0.2, 0.3, 0.4, 0.5], 
+         {"genre": "action"}
+        )
+    ],
+    namespace="example-namespace"
+)
+
+```
+
+#### Query an index
+
+
+The following example queries the index `example-index` with metadata filtering.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+query_response = index.query(
+    namespace="example-namespace",
+    top_k=10,
+    include_values=True,
+    include_metadata=True,
+    vector=[0.1, 0.2, 0.3, 0.4],
+    filter={
+        "genre": {"$in": ["comedy", "documentary", "drama"]}
+    }
+)
+
+```
+
+#### Delete vectors
+
+
+The following example deletes vectors by ID.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+delete_response = index.delete(ids=["vec1", "vec2"], namespace="example-namespace")
+
+```
+
+#### Fetch vectors
+
+
+The following example fetches vectors by ID.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+fetch_response = index.fetch(ids=["vec1", "vec2"], namespace="example-namespace")
+
+```
+
+#### Update vectors
+
+
+The following example updates vectors by ID.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+update_response = index.update(
+    id="vec1",
+    values=[0.1, 0.2, 0.3, 0.4],
+    set_metadata={"genre": "drama"},
+    namespace="example-namespace"
+)
+
+```
+
+#### Create collection
+
+
+The following example creates the collection `example-collection` from `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY",
+              environment="YOUR_ENVIRONMENT")
+
+pinecone.create_collection("example-collection", "example-index")
+
+```
+
+#### List collections
+
+
+The following example returns a list of the collections in the current project.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+active_collections = pinecone.list_collections()
+
+```
+
+#### Describe a collection
+
+
+The following example returns a description of the collection `example-collection`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+collection_description = pinecone.describe_collection("example-collection")
+
+```
+
+#### Delete a collection
+
+
+The following example deletes the collection `example-collection`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+pinecone.delete_collection("example-collection")
+
+```
+
+## Reference
+
+
+For the REST API or other clients, see [the API reference](/reference/).
+
+
+### init()
+
+
+`pinecone.init(**kwargs)`
+
+
+Initialize Pinecone.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `api_key` | str | Your Pinecone API key. |
+| `environment` | str | The cloud environment of your Pinecone project. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+
+```
+
+### configure\_index()
+
+
+`pinecone.configure_index(index_name, **kwargs)`
+
+
+Configure an index to change pod type and number of replicas.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `index_name` | str | The name of the index |
+| `replicas` | int | (Optional) The number of replicas to configure for this index. |
+| `pod_type` | str | (Optional) The new pod type for the index. One of `s1`, `p1`, or `p2` appended with `.` and one of `x1`, `x2`, `x4`, or `x8`. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+new_number_of_replicas = 4
+pinecone.configure_index('example-index', replicas=new_number_of_replicas)
+
+```
+
+### create\_collection()
+
+
+`pinecone.create_collection(**kwargs)`
+
+
+Create a collection from an index.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `name` | str | The name of the collection to be created. |
+| `source` | str | The name of the source index to be used as the source for the collection. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+pinecone.create_collection('example-collection', 'example-index')
+
+```
+
+### create\_index()
+
+
+`pinecone.create_index(**kwargs)`
+
+
+Create an index.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `name` | str | The name of the index to be created. The maximum length is 45 characters. |
+| `dimension` | integer | The dimensions of the vectors to be inserted in the index. |
+| `metric` | str | (Optional) The distance metric to be used for similarity search: 'euclidean', 'cosine', or 'dotproduct'. |
+| `pods` | int | (Optional) The number of pods for the index to use, including replicas. |
+| `replicas` | int | (Optional) The number of replicas. |
+| `pod_type` | str | (Optional) The new pod type for the index. One of `s1`, `p1`, or `p2` appended with `.` and one of `x1`, `x2`, `x4`, or `x8`. |
+| `metadata_config` | object | (Optional) Configuration for the behavior of Pinecone's internal metadata index. By default, all metadata is indexed; when metadata\_config is present, only specified metadata fields are indexed. To specify metadata fields to index, provide a JSON object of the following form: `{"indexed": ["example_metadata_field"]}` |
+| `source_collection` | str | (Optional) The name of the collection to create an index from. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+## The following example creates an index without a metadata
+## configuration. By default, Pinecone indexes all metadata.
+
+pinecone.create_index('example-index', dimension=1024)
+
+## The following example creates an index that only indexes
+## the 'color' metadata field. Queries against this index
+## cannot filter based on any other metadata field.
+
+metadata_config = {
+    'indexed': ['color']
+}
+
+pinecone.create_index('example-index-2', dimension=1024,
+                      metadata_config=metadata_config)
+
+```
+
+### delete\_collection()
+
+
+`pinecone.delete_collection('example-collection')`
+
+
+Delete an existing collection.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `collectionName` | str | The name of the collection to delete. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+pinecone.delete_collection('example-collection')
+
+```
+
+### delete\_index()
+
+
+`pinecone.delete_index(indexName)`
+
+
+Delete an existing index.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `index_name` | str | The name of the index. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+pinecone.delete_index('example-index')
+
+```
+
+### describe\_collection()
+
+
+`pinecone.describe_collection(collectionName)`
+
+
+Get a description of a collection.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `collection_name` | str | The name of the collection. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+collection_description = pinecone.describe_collection('example-collection')
+
+```
+
+Returns:
+
+
+* `collectionMeta` : `object` Configuration information and deployment status of the collection.
+	+ `name` : `string` The name of the collection.
+	+ `size`: `integer` The size of the collection in bytes.
+	+ `status`: `string` The status of the collection.
+
+
+### describe\_index()
+
+
+`pinecone.describe_index(indexName)`
+
+
+Get a description of an index.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `index_name` | str | The name of the index. |
+
+
+Returns:
+
+
+* `database` : `object`
+* `name` : `string` The name of the index.
+* `dimension` : `integer` The dimensions of the vectors to be inserted in the index.
+* `metric` : `string` The distance metric used for similarity search: 'euclidean', 'cosine', or 'dotproduct'.
+* `pods` : `integer` The number of pods the index uses, including replicas.
+* `replicas` : `integer` The number of replicas.
+* `pod_type` : `string` The pod type for the index. One of `s1`, `p1`, or `p2` appended with `.` and one of `x1`, `x2`, `x4`, or `x8`.
+* `metadata_config`: `object` Configuration for the behavior of Pinecone's internal metadata index. By default, all metadata is indexed; when metadata\_config is present, only specified metadata fields are indexed. To specify metadata fields to index, provide a JSON object of the following form: `{"indexed": ["example_metadata_field"]}`
+* `status` : `object`
+* `ready` : `boolean` Whether the index is ready to serve queries.
+* `state` : `string` One of `Initializing`, `ScalingUp`, `ScalingDown`, `Terminating`, or `Ready`.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+index_description = pinecone.describe_index('example-index')
+
+```
+
+### list\_collections()
+
+
+`pinecone.list_collections()`
+
+
+Return a list of the collections in your project.
+
+
+Returns:
+
+
+* `array` of `strings` The names of the collections in your project.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='us-east1-gcp')
+
+active_collections = pinecone.list_collections()
+
+```
+
+### list\_indexes()
+
+
+`pinecone.list_indexes()`
+
+
+Return a list of your Pinecone indexes.
+
+
+Returns:
+
+
+* `array` of `strings` The names of the indexes in your project.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+
+active_indexes = pinecone.list_indexes()
+
+```
+
+### Index()
+
+
+`pinecone.Index(indexName)`
+
+
+Construct an Index object.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `indexName` | str | The name of the index. |
+
+
+Example:
+
+
+Python
+```python
+index = pinecone.Index("example-index")
+
+```
+
+### Index.delete()
+
+
+`Index.delete(**kwargs)`
+
+
+Delete items by their ID from a single namespace.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `ids` | array | (Optional) `array` of `strings` vectors to delete. |
+| `delete_all` | boolean | (Optional) Indicates that all vectors in the index namespace should be deleted. |
+| `namespace` | str | (Optional) The namespace to delete vectors from, if applicable. |
+| `filter` | object | (Optional) If specified, the metadata filter here will be used to select the vectors to delete. This is mutually exclusive with specifying ids to delete in the ids param or using `delete_all=True`. See <https://www.pinecone.io/docs/metadata-filtering/>. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+index = pinecone.Index('example-index')
+
+delete_response = index.delete(ids=['vec1', 'vec2'], namespace='example-namespace')
+
+```
+
+### Index.describe\_index\_stats()
+
+
+`Index.describe_index_stats()`
+
+
+Returns statistics about the index's contents, including the vector count per namespace and the number of dimensions.
+
+
+Returns:
+
+
+* `namespaces` : `object` A mapping for each namespace in the index from the namespace name to a  
+
+summary of its contents. If a metadata filter expression is present, the summary will reflect only vectors matching that expression.
+* `dimension` : `int64` The dimension of the indexed vectors.
+* `indexFullness` : `float` The fullness of the index, regardless of whether a metadata filter expression was passed. The granularity of this metric is 10%.
+* `totalVectorCount` : `int64` The total number of vectors in the index.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+index = pinecone.Index('example-index')
+
+index_stats_response = index.describe_index_stats()
+
+```
+
+### Index.fetch()
+
+
+`Index.fetch(ids, **kwargs)`
+
+
+The Fetch operation looks up and returns vectors, by ID, from a single namespace. The returned vectors include the vector data and metadata.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `ids` | [str] | The vector IDs to fetch. Does not accept values containing spaces. |
+| `namespace` | str | (Optional) The namespace containing the vectors. |
+
+
+Returns:
+
+
+* `vectors` : `object` Contains the vectors.
+* `namespace` : `string` The namespace of the vectors.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+index = pinecone.Index('example-index')
+
+fetch_response = index.fetch(ids=['vec1', 'vec2'], namespace='example-namespace')
+
+```
+
+### Index.query()
+
+
+`Index.query(**kwargs)`
+
+
+Search a namespace using a query vector. Retrieves the ids of the most similar items in a namespace, along with their similarity scores.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `namespace` | str | (Optional) The namespace to query. |
+| `top_k` | int64 | The number of results to return for each query. |
+| `filter` | object | (Optional) The filter to apply. You can use vector metadata to limit your search. See <https://www.pinecone.io/docs/metadata-filtering/>. |
+| `include_values` | boolean | (Optional) Indicates whether vector values are included in the response. Defaults to `false`. |
+| `include_metadata` | boolean | (Optional) Indicates whether metadata is included in the response as well as the ids. Defaults to `false`. |
+| `vector` | [floats] | (Optional) The query vector. This should be the same length as the dimension of the index being queried. Each `query()` request can contain only one of the parameters `id` or `vector`. |
+| `sparse_vector` | dictionary | (Optional) The sparse query vector. This must contain an array of integers named `indices` and an array of floats named `values`. These two arrays must be the same length. |
+| `id` | `string` | (Optional) The unique ID of the vector to be used as a query vector. Each `query()` request can contain only one of the parameters `vector` or `id`. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+ pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+ index = pinecone.Index('example-index')
+
+ query_response = index.query(
+    namespace='example-namespace',
+    top_k=10,
+    include_values=True,
+    include_metadata=True,
+    vector=[0.1, 0.2, 0.3, 0.4],
+    filter={
+        'genre': {'$in': ['comedy', 'documentary', 'drama']}
+    }
+)
+
+```
+
+The following example queries the index `example-index` with a sparse-dense vector.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+query_response = index.query(
+    namespace="example-namespace",
+    top_k=10,
+    include_values=True,
+    include_metadata=True,
+    vector=[0.1, 0.2, 0.3, 0.4],
+    sparse_vector={
+        'indices': [10, 45, 16],
+        'values':  [0.5, 0.5, 0.2]
+    },
+    filter={
+        "genre": {"$in": ["comedy", "documentary", "drama"]}
+    }
+)
+
+```
+
+### Index.update()
+
+
+`Index.update(**kwargs)`
+
+
+Updates vectors in a namespace. If a value is included, it will overwrite the previous value.  
+
+If `set_metadata` is included, the values of the fields specified in it will be added or overwrite the previous value.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `id` | str | The vector's unique ID. |
+| `values` | [float] | (Optional) Vector data. |
+| `set_metadata` | object | (Optional) Metadata to set for the vector. |
+| `namespace` | str | (Optional) The namespace containing the vector. |
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+index = pinecone.Index('example-index')
+
+update_response = index.update(
+    id='vec1',
+    values=[0.1, 0.2, 0.3, 0.4],
+    set_metadata={'genre': 'drama'},
+    namespace='example-namespace'
+)
+
+```
+
+### Index.upsert()
+
+
+`Index.upsert(**kwargs)`
+
+
+Writes vectors into a namespace. If a new value is upserted for an existing vector ID, it will overwrite the previous value.
+
+
+
+
+| Parameters | Type | Description |
+| --- | --- | --- |
+| `vectors` | [object] | An array containing the vectors to upsert. Recommended batch limit is 100 vectors.`id` (str) - The vector's unique id.`values` ([float]) - The vector data.`metadata` (object) - (Optional) Metadata for the vector.`sparse_vector` (object) - (Optional) A dictionary containing the index and values arrays containing the sparse vector values. |
+| `namespace` | str | (Optional) The namespace name to upsert vectors. |
+
+
+Returns:
+
+
+* `upsertedCount` : `int64` The number of vectors upserted.
+
+
+Example:
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key='YOUR_API_KEY', environment='YOUR_ENVIRONMENT')
+index = pinecone.Index('example-index')
+
+upsert_response = index.upsert(
+   vectors=[
+       {'id': "vec1", "values":[0.1, 0.2, 0.3, 0.4], "metadata": {'genre': 'drama'}},
+       {'id': "vec2", "values":[0.2, 0.3, 0.4, 0.5], "metadata": {'genre': 'action'}},
+   ],
+   namespace='example-namespace'
+)
+
+```
+
+The following example upserts vectors with sparse and dense values to `example-index`.
+
+
+Python
+```python
+import pinecone
+
+pinecone.init(api_key="YOUR_API_KEY", environment="YOUR_ENVIRONMENT")
+index = pinecone.Index("example-index")
+
+upsert_response = index.upsert(
+    vectors=[
+        {'id': 'vec1',
+         'values': [0.1, 0.2, 0.3, 0.4],
+         'metadata': {'genre': 'drama'},
+         'sparse_values': {
+             'indices': [10, 45, 16],
+             'values': [0.5, 0.5, 0.2]
+         }},
+        {'id': 'vec2',
+         'values': [0.2, 0.3, 0.4, 0.5],
+         'metadata': {'genre': 'action'},
+         'sparse_values': {
+             'indices': [15, 40, 11],
+             'values': [0.4, 0.5, 0.2]
+         }}
+    ],
+    namespace='example-namespace'
+)
+
+```
+Updated 4 months ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Getting Started](#getting-started)
+		- [Installation](#installation)
+		- [Usage](#usage)
+	+ [Reference](#reference)
+		- [init()](#init)
+		- [configure\_index()](#configure_index)
+		- [create\_collection()](#create_collection)
+		- [create\_index()](#create_index)
+		- [delete\_collection()](#delete_collection)
+		- [delete\_index()](#delete_index)
+		- [describe\_collection()](#describe_collection)
+		- [describe\_index()](#describe_index)
+		- [list\_collections()](#list_collections)
+		- [list\_indexes()](#list_indexes)
+		- [Index()](#index)
+		- [Index.delete()](#indexdelete)
+		- [Index.describe\_index\_stats()](#indexdescribe_index_stats)
+		- [Index.fetch()](#indexfetch)
+		- [Index.query()](#indexquery)
+		- [Index.update()](#indexupdate)
+		- [Index.upsert()](#indexupsert)

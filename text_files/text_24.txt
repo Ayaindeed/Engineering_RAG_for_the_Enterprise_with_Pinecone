@@ -1,0 +1,108 @@
+# Performance tuning
+
+[Suggest Edits](/edit/performance-tuning)This section provides some tips for getting the best performance out of Pinecone.
+
+
+## Basic performance checklist
+
+
+* **Switch to a cloud environment.** For example: EC2, GCE, [Google Colab](https://colab.research.google.com), [GCP AI Platform Notebook](https://cloud.google.com/ai-platform-notebooks), or [SageMaker Notebook](https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html). If you experience slow uploads or high query latencies, it might be because you are accessing Pinecone from your home network.
+* **Deploy your application and your Pinecone service in the same region.** [Contact us](https://www.pinecone.io/contact/) if you need a dedicated deployment.
+* **Reuse connections.** We recommend you reuse the same `pinecone.Index()` instance when you are upserting and querying the same index.
+* **Operate within known <limits>.**
+
+
+## How to increase throughput
+
+
+To increase throughput (QPS), increase the number of replicas for your index.
+
+
+**Example**
+
+
+The following example increases the number of replicas for `example-index` to 4.
+
+
+PythonJavaScriptcurl
+```python
+pinecone.configure_index("example-index", replicas=4)
+
+```
+
+```python
+await pinecone.configureIndex("example-index", { replicas: 4 });
+
+```
+
+```python
+curl -i -X PATCH https://controller.us-west1-gcp.pinecone.io/databases/example-index \
+  -H 'Api-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "replicas": 4
+  }'
+
+```
+
+See the [configure\_index API reference](/reference/configure_index/) for more details.
+
+
+
+## Using the gRPC client to get higher upsert speeds
+
+
+Pinecone has a gRPC flavor of the standard client ([installation](installation#installing-the-grpc-flavor-of-the-standard-client)) that can provide higher upsert speeds for multi-pod indexes.
+
+
+To connect to an index via the gRPC client:
+
+
+Python
+```python
+
+index = pinecone.GRPCIndex("index-name")
+
+
+```
+
+The syntax for upsert, query, fetch, and delete with the gRPC client remain the same as the standard client.
+
+
+We recommend you use parallel upserts to get the best performance.
+
+
+Python
+```python
+
+index = pinecone.GRPCIndex('example-index')
+def chunker(seq, batch_size):
+  return (seq[pos:pos + batch_size] for pos in range(0, len(seq), batch_size))
+async_results = [
+        index.upsert(vectors=chunk, async_req=True)
+        for chunk in chunker(data, batch_size=100)
+    ]
+# Wait for and retrieve responses (in case of error)
+[async_result.result() for async_result in async_results]
+
+
+```
+
+We recommend you use the gRPC client for multi-pod indexes only. The performance of the standard and gRPC clients are similar in a single-pod index.
+
+
+It's possible to get write throttled faster when upserting using the gRPC index. If you see this often, we recommend you use a backoff algorithm while upserting.
+
+
+Pinecone is thread-safe, so you can launch multiple read requests and multiple write requests in parallel. Launching multiple requests can help with improving your throughput. However, reads and writes can’t be performed in parallel, therefore writing in large batches might affect query latency and vice versa.
+
+Updated 28 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Basic performance checklist](#basic-performance-checklist)
+	+ [How to increase throughput](#how-to-increase-throughput)
+	+ [Using the gRPC client to get higher upsert speeds](#using-the-grpc-client-to-get-higher-upsert-speeds)

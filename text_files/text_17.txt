@@ -1,0 +1,23 @@
+# Manage cost
+
+[Suggest Edits](/edit/manage-cost)## Overview
+
+
+This category contains guides for tasks related to managing spending in Pinecone..
+
+
+## Tasks
+
+
+* [Managing cost](managing-cost)
+* [Understanding cost](understanding-cost)
+* [Monitoring usage](monitoring-usage)
+Updated 29 days ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Tasks](#tasks)

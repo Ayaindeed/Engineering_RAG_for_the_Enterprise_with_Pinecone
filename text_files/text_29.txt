@@ -1,0 +1,10 @@
+# Node.JS Client
+
+[Suggest Edits](/edit/node-client)See the [Pinecone Node.JS SDK documentation](https://pinecone-io.github.io/pinecone-ts-client/) for installation instructions, usage examples, and reference information.
+
+Updated 29 days ago 
+
+
+
+---
+

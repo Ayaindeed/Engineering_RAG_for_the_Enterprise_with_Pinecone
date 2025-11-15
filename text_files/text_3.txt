@@ -1,0 +1,40 @@
+# Architecture
+
+[Suggest Edits](/edit/architecture)## Overview
+
+
+This document describes the basic architecture of the Pinecone database.
+
+
+## Basic architecture
+
+
+The Pinecone vector database is a cloud-based service deployed partly on Kubernetes. Pinecone serves control plane requests from an API gateway and routes these requests to user indexes; clients make data plane requests directly to pods. See Fig. 1 below. 
+
+
+**Figure 1: Pinecone architecture diagram**
+
+
+ ![Pinecone architecture diagram](https://raw.githubusercontent.com/pinecone-io/img/main/Pinecone%20architecture%20diagram.png)
+
+
+## Components
+
+
+* **Pods**. Each index has one or more replicas, each of which is deployed to a pod with assigned SSD and memory capacity. The CPU assigned to the pod performs computation; the SSD stores metadata.
+* A **stream processor** indexes vectors.
+* The **blob store** contains persistent snapshots of replica data.
+
+
+For more information about security and encryption, see [Security](security).
+
+Updated 4 months ago 
+
+
+
+---
+
+* [Table of Contents](#)
+* + [Overview](#overview)
+	+ [Basic architecture](#basic-architecture)
+	+ [Components](#components)
